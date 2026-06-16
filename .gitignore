@@ -1,0 +1,12 @@
+# sensitive data
+.env
+data/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+
+# outputs - exclude everything except Ergebnisse.xlsx
+outputs/*
+!outputs/Ergebnisse.xlsx

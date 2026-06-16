@@ -1,0 +1,18 @@
+# Core data‑science stack
+numpy==2.4.3
+pandas==3.0.1
+scipy==1.17.1                   # t-tests
+statsmodels==0.14.6             # linear mixed models
+patsy==0.5.6                    # formula parsing, required by statsmodels
+
+# Excel export
+openpyxl==3.1.5                 # works with pandas .to_excel(engine="openpyxl")
+et_xmlfile==2.0.0               # dependency of openpyxl
+
+# Credentials
+python-dotenv==1.0.1             # .env file support for Excel password
+
+# Indirect dependencies
+python-dateutil==2.9.0.post0    # datetime parsing
+six==1.17.0                     # legacy compatibility, pulled in by python-dateutil
+packaging==26.0                 # version parsing, pulled in by statsmodels
