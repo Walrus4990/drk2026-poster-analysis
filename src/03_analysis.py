@@ -227,7 +227,7 @@ for xante, xpost, col_diff in triplets:
         })
 
 m_w_unterschied_df = pd.DataFrame(m_w_results)
-print(m_w_unterschied_df)
+
 
 ############### DIFFERENCE DIAGNOSE (ANOVA) ######################
 
@@ -273,7 +273,6 @@ for xante, xpost, diff_col in anova_triplets:
             })
 
 tukey_df = pd.DataFrame(tukey_results).sort_values(by=['Gruppe_1', 'p_Wert'], ascending=True)
-print(tukey_df)
 
 ########## TESTSCORE FREQUENZ ########################
 
@@ -299,7 +298,7 @@ freq_df['Test_Score'] = freq_df['Test_Score'].map(test_score_labels)
 
 ########## REGRESSION ANALYSIS ########################
 
-#score_value — the outcome, what we're trying to explain - voreher as default
+#score_value — the outcome, what we're trying to explain - vorher as default
 #zeitpunkt — fixed effect for time (vorher/nachher)
 #geschlecht — fixed effect for sex - w as default
 #zeitpunkt * geschlecht — interaction and both main effects
@@ -365,6 +364,8 @@ con.close()
 
 with pd.ExcelWriter("outputs/Ergebnisse.xlsx", engine="openpyxl", mode='w') as writer:
     alter_df.to_excel(writer, sheet_name="Alter", index=False)
+
+
     diagnose_df.to_excel(writer, sheet_name="Diagnose", index=False)
     diagnose_agg_df.to_excel(writer,sheet_name="Diagnose Zusammenfassung", index=True)
     verlauf_df.to_excel(writer, sheet_name="Verlauf", index=False)
@@ -387,3 +388,24 @@ with pd.ExcelWriter("outputs/Ergebnisse.xlsx", engine="openpyxl", mode='w') as w
     tukey_start = 5 + len(anova_df) + 3
     ws.cell(row=tukey_start, column=1).value = "------ Tukey Post-hoc -------"
     tukey_df.to_excel(writer, sheet_name="ANOVA Diagnose", index=False, startrow=tukey_start)
+
+
+########## EXPORT TO MARKDOWN ########################
+
+
+alter_df.to_markdown("outputs/Alter.md", index=False)
+diagnose_df.to_markdown("outputs/Diagnose.md", index=False)
+m_w_unterschied_df.to_markdown("outputs/Geschlechtervergleich.md", index=False)
+verlauf_df.to_markdown("outputs/Verlauf.md", index=False)
+
+# ANOVA and Tukey in one file
+with open("outputs/Varianzanalyse_diagnose.md", "w") as f:
+    f.write("**Hinweis:**\n\n")
+    f.write("Die ANOVA prüft, ob sich die Diagnosegruppen insgesamt unterscheiden.\n\n")
+    f.write("Der Tukey-Test zeigt anschließend, welche Gruppen sich paarweise voneinander unterscheiden.\n\n")
+    f.write("### ANOVA\n\n")
+    f.write(anova_df.to_markdown(index=False))
+    f.write("\n\n### Tukey Post-hoc\n\n")
+    f.write(tukey_df.to_markdown(index=False))
+
+model_df.to_markdown("outputs/Regressionsanalyse.md", index=False)

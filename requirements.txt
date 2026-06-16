@@ -9,6 +9,9 @@ patsy==0.5.6                    # formula parsing, required by statsmodels
 openpyxl==3.1.5                 # works with pandas .to_excel(engine="openpyxl")
 et_xmlfile==2.0.0               # dependency of openpyxl
 
+# Markdown export
+tabulate==0.9.0                 # required for pandas .to_markdown()
+
 # Credentials
 python-dotenv==1.0.1             # .env file support for Excel password
 

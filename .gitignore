@@ -7,6 +7,7 @@ __pycache__/
 *.pyc
 .venv/
 
-# outputs - exclude everything except Ergebnisse.xlsx
+# outputs - exclude everything except Ergebnisse.xlsx and *.md files
 outputs/*
 !outputs/Ergebnisse.xlsx
+!outputs/*.md
