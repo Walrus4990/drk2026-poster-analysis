@@ -22,7 +22,7 @@ Immunologie (DGRh), 9.–12. September 2026, Congress Center Leipzig.
 - `01_ingest.py` — Rohdaten einlesen, bereinigen, in SQLite speichern
 - `02_reshape.py` — Scores aggregieren, normalisieren, Langtabelle für Regression erstellen
 - `03_descriptive_analysis.py` — Deskriptive Auswertung und Export nach Excel
-- `04_regression.py` — Regressionsanalyse, Modelldiagnostik und Export
+- `04_regression_analysis.py` — Regressionsanalyse, Modelldiagnostik und Export
 
 ## Hilfsdateien
 
