@@ -191,21 +191,21 @@ with open("outputs/Regressionsanalyse.md", "w") as f:
     f.write("## Multivariate Regressionsanalyse\n\n")
     f.write(model_df.to_markdown(index=False))
 
-    f.write("\n\n---\n\n")
-    f.write("## Brauchen wir einen Interaktionsterm Zeitpunkt x Geschlecht?\n\n")
-    f.write(aic_df.to_markdown(index=False))
-    f.write(
-        "\n\n**Schlussfolgerung:** Der Interaktionsterm verbessert den Modellfit bei nur einem Score um mehr als 2 AIC-Punkte,"
-            "und dort nur um 2,8. Der Interaktionsterm wird aus dem finalen Modell ausgeschlossen.\n"
-    )
+    # f.write("\n\n---\n\n")
+    # f.write("## Brauchen wir einen Interaktionsterm Zeitpunkt x Geschlecht?\n\n")
+    # f.write(aic_df.to_markdown(index=False))
+    # f.write(
+    #     "\n\n**Schlussfolgerung:** Der Interaktionsterm verbessert den Modellfit bei nur einem Score um mehr als 2 AIC-Punkte,"
+    #         "und dort nur um 2,8. Der Interaktionsterm wird aus dem finalen Modell ausgeschlossen.\n"
+    # )
 
-    f.write("\n\n---\n\n")
-    f.write("## Sind die Diagnosegruppen-Koeffizienten im Norm-Modell konfundiert?\n\n")
-    f.write(comparison_df.to_markdown(index=False))
-    f.write(
-        "\n\n**Schlussfolgerung:** Der Behandlungseffektkoeffizient (Zeitpunkt) bleibt stabil. "
-        "Geschlecht- und Alterkoeffizienten ändern sich um mehr als 10% bei stabilem Standardfehler. "
-        "Die Diagnosezugehörigkeit kovariiert mit anderen Prädiktoren im Modell. "
-        "Um Konfundierung zu vermeiden und die Effekte der einzelnen Prädiktoren isoliert schätzen zu können, "
-        "wird die Diagnose in allen Modellen berücksichtigt.\n"
-    )
+    # f.write("\n\n---\n\n")
+    # f.write("## Sind die Diagnosegruppen-Koeffizienten im Norm-Modell konfundiert?\n\n")
+    # f.write(comparison_df.to_markdown(index=False))
+    # f.write(
+    #     "\n\n**Schlussfolgerung:** Der Behandlungseffektkoeffizient (Zeitpunkt) bleibt stabil. "
+    #     "Geschlecht- und Alterkoeffizienten ändern sich um mehr als 10% bei stabilem Standardfehler. "
+    #     "Die Diagnosezugehörigkeit kovariiert mit anderen Prädiktoren im Modell. "
+    #     "Um Konfundierung zu vermeiden und die Effekte der einzelnen Prädiktoren isoliert schätzen zu können, "
+    #     "wird die Diagnose in allen Modellen berücksichtigt.\n"
+    # )
