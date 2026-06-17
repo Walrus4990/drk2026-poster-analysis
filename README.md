@@ -4,7 +4,7 @@ Dieser Code wertet Routinedaten einer stationären rheumatologischen Behandlung 
 Die Analyse wurde erstellt für den 54. Kongress der Deutschen Gesellschaft für Rheumatologie
 und Klinische Immunologie (DGRh), 9.–12. September 2026, Congress Center Leipzig.
 
-**Zitierung:** Seyfert C (2026): Rheumatologische Komplexbehandlung — Ergebnisse aus Routinedaten.
+**Zitierung:** Völz A; Seyfert C (2026): Rheumatologische Komplexbehandlung — Ergebnisse aus Routinedaten.
 Abstract Nr. 250. 54. Kongress der Deutschen Gesellschaft für Rheumatologie und Klinische
 Immunologie (DGRh), 9.–12. September 2026, Congress Center Leipzig.
 

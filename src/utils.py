@@ -31,18 +31,3 @@ def build_diagnose_gruppe(df):
         lambda x: x if x in hauptgruppen else 'Sonstige'    #if it's in hauptgruppen keep it as is, otherwise replace with 'Sonstige'.
     )
     return df
-
-# Core score pairs — used across analysis and regression files
-score_pairs = [
-    ('vas1a', 'vas2a', 'vasa'),
-    ('vas1p', 'vas2p', 'vasp'),
-    ('ffbh1', 'ffbh2', 'ffbh'),
-    ('norm1', 'norm2', 'norm')
-]
-
-score_labels = {
-    'vas1a': 'VAS-A',
-    'vas1p': 'VAS-P',
-    'ffbh1': 'FFbH',
-    'norm1': 'Aktivität'
-}

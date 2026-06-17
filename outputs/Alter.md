@@ -1,4 +1,4 @@
-| geschlecht   |   Durchschnittsalter |   StdAbw |   N |   t_Stat |   p_Wert | sig   |
+| Geschlecht   |   Durchschnittsalter |   StdAbw |   N |   t_Stat |   p_Wert | sig   |
 |:-------------|---------------------:|---------:|----:|---------:|---------:|:------|
 | m            |                62.12 |    11.31 |  75 |          |          | nan   |
 | w            |                64.52 |    10.47 | 176 |          |          | nan   |

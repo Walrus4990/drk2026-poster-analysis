@@ -3,7 +3,7 @@ import sqlite3
 from scipy import stats
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
-from utils import significance_stars, build_diagnose_gruppe, score_pairs, score_labels
+from utils import significance_stars, build_diagnose_gruppe
 
 ########## LOAD CLEAN DATASET ########################
 
@@ -48,6 +48,7 @@ alter_total_row = pd.DataFrame({
 
 alter_df = pd.concat([alter_df, alter_total_row], ignore_index=True)
 alter_df[['Durchschnittsalter', 'StdAbw']] = alter_df[['Durchschnittsalter', 'StdAbw']].round(2)
+alter_df = alter_df.rename(columns={"geschlecht": "Geschlecht"})
 
 
 ########## DIAGNOSE ########################
@@ -80,15 +81,25 @@ diagnose_agg_df.columns = [str(col) + ' (%)' for col in diagnose_agg_df.columns]
 
 ############### RESPONSE TO TREATMENT TESTS ######################
 
-#fetch score pairs from utils
-pairs = [(before, after) for before, after, _ in score_pairs]
+pairs = [
+    ('vas1a', 'vas2a'),
+    ('vas1p', 'vas2p'),
+    ('ffbh1', 'ffbh2'),
+    ('norm1', 'norm2')
+]
+
+score_labels = {
+    'vas1a': 'VAS-a',
+    'vas1p': 'VAS-p',
+    'ffbh1': 'FFbH',
+    'norm1': 'Aktivität'
+}
 
 groups = [
     ('insgesamt', df),
     ('m', df[df["geschlecht"] == "m"]),
     ('w', df[df["geschlecht"] == "w"])
 ]
-
 
 results = []
 for group_name, group_df in groups:         # repeat loop for all, men and women
@@ -117,8 +128,8 @@ verlauf_df = verlauf_df.sort_values(['Test_Score', 'group_order']).drop(columns=
 ############### NORMALISED SCORES FOR PLOTTING ######################
 
 norm_score_labels = {
-    'vas_norm1a': 'VAS-A',
-    'vas_norm1p': 'VAS-P',
+    'vas_norm1a': 'VAS-a',
+    'vas_norm1p': 'VAS-p',
     'ffbh_norm1': 'FFbH',
     'norm1':      'Aktivität'
 }

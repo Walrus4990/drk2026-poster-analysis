@@ -3,7 +3,7 @@ import numpy as np
 import sqlite3
 import statsmodels.formula.api as smf
 
-from utils import significance_stars, format_coef, hauptgruppen, build_diagnose_gruppe, score_pairs
+from utils import format_coef, hauptgruppen, build_diagnose_gruppe
 
 ##fetch data
 
@@ -147,6 +147,13 @@ comparison_df = pd.DataFrame(comparison_results)
 # 2. diagnose_gruppe included for all scores including norm (Test 2)
 # final model formula = base (defined in Test 1)
 
+score_type_labels = {
+    'vasa': 'VAS-a',
+    'vasp': 'VAS-p',
+    'ffbh': 'FFbH',
+    'norm': 'Aktivität'
+}
+
 model_results = []
 for score in long_df['score_type'].unique():
     data = long_df[long_df['score_type'] == score].copy()
@@ -162,6 +169,7 @@ for score in long_df['score_type'].unique():
 ##### EXPORT
 
 model_df = pd.DataFrame(model_results)
+model_df['score_type'] = model_df['score_type'].map(score_type_labels).fillna(model_df['score_type'])
 model_df = model_df.fillna('').replace('nan', '')
 footnote = pd.DataFrame([{'score_type': '* p<0.05, ** p<0.01, *** p<0.001'}])
 model_df = pd.concat([model_df, footnote], ignore_index=True).fillna('')

@@ -35,7 +35,7 @@ The results contained in `outputs/Ergebnisse.xlsx` and the markdown tables in
 scientific direction of Dr. Christine Seyfert. They may be reproduced for academic, educational,
 or non-commercial purposes provided that proper citation is given.
 
-Seyfert C (2026): Rheumatologische Komplexbehandlung — Ergebnisse aus Routinedaten.
+Völz A; Seyfert C (2026): Rheumatologische Komplexbehandlung — Ergebnisse aus Routinedaten.
 Abstract Nr. 250. 54. Kongress der Deutschen Gesellschaft für Rheumatologie und Klinische
 Immunologie (DGRh), 9.–12. September 2026, Congress Center Leipzig.
 
