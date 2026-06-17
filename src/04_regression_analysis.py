@@ -166,13 +166,22 @@ for score in long_df['score_type'].unique():
     row['N'] = len(data) // 2
     model_results.append(row)
 
-##### EXPORT
-
 model_df = pd.DataFrame(model_results)
+
+# apply labels and rename columns
 model_df['score_type'] = model_df['score_type'].map(score_type_labels).fillna(model_df['score_type'])
-model_df = model_df.fillna('').replace('nan', '')
+model_df = model_df.rename(columns={
+    'score_type': 'Score',
+    'zeitpunkt':  'Zeitpunkt',
+    'geschlecht': 'Geschlecht',
+    'alter':      'Alter'
+})
+
 footnote = pd.DataFrame([{'score_type': '* p<0.05, ** p<0.01, *** p<0.001'}])
 model_df = pd.concat([model_df, footnote], ignore_index=True).fillna('')
+
+
+##### EXPORT
 
 # export to SQL
 con = sqlite3.connect("data/rheuma_konf_2026.db")
