@@ -1,9 +1,9 @@
 import pandas as pd
 import sqlite3
 from scipy import stats
-import numpy as np
-import statsmodels.formula.api as smf
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
+
+from utils import significance_stars, build_diagnose_gruppe, score_pairs, score_labels
 
 ########## LOAD CLEAN DATASET ########################
 
@@ -13,30 +13,9 @@ freq_df = pd.read_sql("SELECT * FROM test_score_frequencies", con)
 long_df = pd.read_sql("SELECT * FROM long", con)
 con.close()
 
+######## ADD DIAGNOSE GRUPPEN COLUMN ###################
 
-#################### MAKING SIGNIFICANCE PRETTY ##############
-
-
-def significance_stars(p):
-    if pd.isna(p):
-        return ''
-    elif p < 0.001:
-        return '***'
-    elif p < 0.01:
-        return '**'
-    elif p < 0.05:
-        return '*'
-    else:
-        return ''
-
-def format_coef(coef, p):
-    if pd.isna(coef):
-        return ''
-    stars = significance_stars(p)
-    return f"{coef}{stars}"
-
-
-
+df = build_diagnose_gruppe(df)
 
 ########## AGE & GENDER ########################
 
@@ -73,8 +52,6 @@ alter_df[['Durchschnittsalter', 'StdAbw']] = alter_df[['Durchschnittsalter', 'St
 
 ########## DIAGNOSE ########################
 
-df['hd_basis'] = df['hd'].str.split('.').str[0] #create Basisdiagnose column snce used a lot throughout
-
 
 diagnose_df = df.groupby(df["hd_basis"]).agg(
     insgesamt=("hd", "count"),
@@ -91,15 +68,6 @@ diagnose_total_row = pd.DataFrame({
 
 diagnose_df = pd.concat([diagnose_df, diagnose_total_row], ignore_index=True)
 
-#add sonstige
-#For each value x in the split series
-#if it's in hauptgruppen keep it as is, otherwise replace with 'Sonstige'.
-
-hauptgruppen = ['L40', 'M05', 'M06', 'M45']
-
-df['diagnose_gruppe'] = df['hd_basis'].apply(
-    lambda x: x if x in hauptgruppen else 'Sonstige'
-)
 
 diagnose_agg_df = pd.crosstab(
     df['geschlecht'],
@@ -112,19 +80,8 @@ diagnose_agg_df.columns = [str(col) + ' (%)' for col in diagnose_agg_df.columns]
 
 ############### RESPONSE TO TREATMENT TESTS ######################
 
-score_labels = {
-    'vas1a': 'VAS-A',
-    'vas1p': 'VAS-P',
-    'ffbh1': 'FFbH',
-    'norm1': 'Aktivität'
-}
-
-pairs=[
-    ('vas1a', 'vas2a'),
-    ('vas1p', 'vas2p'),
-    ('ffbh1', 'ffbh2'),
-    ('norm1', 'norm2')
-]
+#fetch score pairs from utils
+pairs = [(before, after) for before, after, _ in score_pairs]
 
 groups = [
     ('insgesamt', df),
@@ -296,69 +253,6 @@ test_score_labels = {
 
 freq_df['Test_Score'] = freq_df['Test_Score'].map(test_score_labels)
 
-########## REGRESSION ANALYSIS ########################
-
-#score_value — the outcome, what we're trying to explain - vorher as default
-#zeitpunkt — fixed effect for time (vorher/nachher)
-#geschlecht — fixed effect for sex - w as default
-#zeitpunkt * geschlecht — interaction and both main effects
-#alter — age as a covariate
-#diagnose  - as a co/variate
-#groups=data["patnr"] — identifies which rows belong to the same patient
-
-
-
-long_df = long_df.merge(
-    df[['patnr', 'diagnose_gruppe']],
-    on='patnr',
-    how='left'
-)
-
-base_covariates = {
-    'zeitpunkt':   "C(zeitpunkt, Treatment('vorher'))[T.nachher]",
-    'geschlecht':  "C(geschlecht, Treatment('w'))[T.m]",
-    'interaktion': "C(zeitpunkt, Treatment('vorher'))[T.nachher]:C(geschlecht, Treatment('w'))[T.m]",
-    'alter':       'alter',
-}
-
-diagnose_covariates = {
-    g: f"C(diagnose_gruppe, Treatment('Sonstige'))[T.{g}]" for g in hauptgruppen
-}
-
-def build_model(diagnose_cov=True): #function that takes a boolean to switch between models
-    model = """score_value ~
-        C(zeitpunkt, Treatment('vorher')) *
-        C(geschlecht, Treatment('w')) +
-        alter"""
-    if diagnose_cov: #if True (i.e. not norm)
-        model += " + C(diagnose_gruppe, Treatment('Sonstige'))"
-        covariates = base_covariates | diagnose_covariates #combine base & diagnose covariates to one dictionary
-    else:
-        model
-        covariates = base_covariates
-    return model, covariates
-
-model_results = []
-for score in long_df['score_type'].unique(): #for every unique score (i.e. ffbh)
-    data = long_df[long_df['score_type'] == score].copy() # copy the data for the specific test score
-    model, covariates = build_model(diagnose_cov=score != 'norm') #build model and select co-variates depending on eth value of score
-    result = smf.mixedlm(model, data=data, groups=data["patnr"]).fit(reml=True) #run the model, patnr  is the grouping var in the model
-
-    row = {'score_type': score}
-    for key, value in covariates.items():
-        row[key] = format_coef(round(result.params.get(value, np.nan), 4), result.pvalues.get(value, np.nan))
-    row['N'] = len(data) // 2
-    model_results.append(row)
-
-
-model_df = pd.DataFrame(model_results)
-footnote = pd.DataFrame([{'score_type': '* p<0.05, ** p<0.01, *** p<0.001'}])
-model_df = pd.concat([model_df, footnote], ignore_index=True)
-
-#exporting to SQL to look at table
-con = sqlite3.connect("data/rheuma_konf_2026.db")
-model_df.to_sql("model", con, if_exists="replace", index=False)
-con.close()
 
 ########## EXPORT TO EXCEL ########################
 
@@ -372,7 +266,6 @@ with pd.ExcelWriter("outputs/Ergebnisse.xlsx", engine="openpyxl", mode='w') as w
     verlauf_norm_df.to_excel(writer, sheet_name="Verlauf Normalisiert", index=False)
     m_w_unterschied_df.to_excel(writer, sheet_name="Geschlechtervergleich", index=False)
     freq_df.to_excel(writer, sheet_name="Scoreverteilung", index=False)
-    model_df.to_excel(writer, sheet_name="Multivariate Regressionsanalyse", index=False)
 
     # ANOVA and Tukey on same sheet
     anova_df.to_excel(writer, sheet_name="ANOVA Diagnose", index=False, startrow=5)
@@ -407,5 +300,3 @@ with open("outputs/Varianzanalyse_diagnose.md", "w") as f:
     f.write(anova_df.to_markdown(index=False))
     f.write("\n\n### Tukey Post-hoc\n\n")
     f.write(tukey_df.to_markdown(index=False))
-
-model_df.to_markdown("outputs/Regressionsanalyse.md", index=False)
