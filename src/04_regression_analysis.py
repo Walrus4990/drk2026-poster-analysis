@@ -166,6 +166,7 @@ for score in long_df['score_type'].unique():
     row['N'] = len(data) // 2
     model_results.append(row)
 
+#format dataframe for export
 model_df = pd.DataFrame(model_results)
 model_df['N'] = model_df['N'].astype(int).astype(str)
 
@@ -178,7 +179,8 @@ model_df = model_df.rename(columns={
     'alter':      'Alter'
 })
 
-footnote = pd.DataFrame([{'Score': '* p<0.05,\n\n** p<0.01,\n\n*** p<0.001'}])
+#add sig level legend
+footnote = pd.DataFrame([{'Score': '* p<0.05, ** p<0.01, *** p<0.001'}])
 model_df = pd.concat([model_df, footnote], ignore_index=True).fillna('')
 
 
@@ -189,41 +191,26 @@ con = sqlite3.connect("data/rheuma_konf_2026.db")
 model_df.to_sql("model", con, if_exists="replace", index=False)
 con.close()
 
-########## EXPORT TO EXCEL ########################
-
-with pd.ExcelWriter("outputs/Ergebnisse.xlsx", engine="openpyxl", mode='a', if_sheet_exists='replace') as writer:
-    model_df.to_excel(writer, sheet_name="Multivariate Regressionsanalyse", index=False)
-
-    aic_df.to_excel(writer, sheet_name="Modelldiagnostik", index=False, startrow=1)
-    ws = writer.sheets["Modelldiagnostik"]
-    ws.cell(row=1, column=1).value = "--- Interaktionsterm Zeitpunkt x Geschlecht ---"
-
-    diag_start = len(aic_df) + 5
-    comparison_df.to_excel(writer, sheet_name="Modelldiagnostik", index=False, startrow=diag_start + 1)
-    ws.cell(row=diag_start, column=1).value = "--- Konfundierung Norm und Diagnosegruppe ---"
-
-
 ########## EXPORT TO MARKDOWN ########################
 
 with open("outputs/Regressionsanalyse.md", "w") as f:
     f.write("## Multivariate Regressionsanalyse\n\n")
     f.write(model_df.to_markdown(index=False))
 
-    # f.write("\n\n---\n\n")
-    # f.write("## Brauchen wir einen Interaktionsterm Zeitpunkt x Geschlecht?\n\n")
-    # f.write(aic_df.to_markdown(index=False))
-    # f.write(
-    #     "\n\n**Schlussfolgerung:** Der Interaktionsterm verbessert den Modellfit bei nur einem Score um mehr als 2 AIC-Punkte,"
-    #         "und dort nur um 2,8. Der Interaktionsterm wird aus dem finalen Modell ausgeschlossen.\n"
-    # )
+########## EXPORT TO EXCEL ########################
 
-    # f.write("\n\n---\n\n")
-    # f.write("## Sind die Diagnosegruppen-Koeffizienten im Norm-Modell konfundiert?\n\n")
-    # f.write(comparison_df.to_markdown(index=False))
-    # f.write(
-    #     "\n\n**Schlussfolgerung:** Der Behandlungseffektkoeffizient (Zeitpunkt) bleibt stabil. "
-    #     "Geschlecht- und Alterkoeffizienten ändern sich um mehr als 10% bei stabilem Standardfehler. "
-    #     "Die Diagnosezugehörigkeit kovariiert mit anderen Prädiktoren im Modell. "
-    #     "Um Konfundierung zu vermeiden und die Effekte der einzelnen Prädiktoren isoliert schätzen zu können, "
-    #     "wird die Diagnose in allen Modellen berücksichtigt.\n"
-    # )
+# with pd.ExcelWriter("outputs/Ergebnisse.xlsx", engine="openpyxl", mode='a', if_sheet_exists='replace') as writer:
+#     model_df.to_excel(writer, sheet_name="Multivariate Regressionsanalyse", index=False)
+
+#     aic_df.to_excel(writer, sheet_name="Modelldiagnostik", index=False, startrow=1)
+#     ws = writer.sheets["Modelldiagnostik"]
+#     ws.cell(row=1, column=1).value = "--- Interaktionsterm Zeitpunkt x Geschlecht ---"
+
+#     diag_start = len(aic_df) + 5
+#     comparison_df.to_excel(writer, sheet_name="Modelldiagnostik", index=False, startrow=diag_start + 1)
+#     ws.cell(row=diag_start, column=1).value = "--- Konfundierung Norm und Diagnosegruppe ---"
+
+with pd.ExcelWriter("outputs/Ergebnisse.xlsx", engine="openpyxl", mode='a', if_sheet_exists='replace') as writer:
+    model_df.to_excel(writer, sheet_name="Multivariate Regressionsanalyse", index=False)
+    aic_df.to_excel(writer, sheet_name="Interaktionsterm", index=False)
+    comparison_df.to_excel(writer, sheet_name="Konfundierung", index=False)
