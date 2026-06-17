@@ -167,6 +167,7 @@ for score in long_df['score_type'].unique():
     model_results.append(row)
 
 model_df = pd.DataFrame(model_results)
+model_df['N'] = model_df['N'].astype(int).astype(str)
 
 # apply labels and rename columns
 model_df['score_type'] = model_df['score_type'].map(score_type_labels).fillna(model_df['score_type'])
@@ -177,7 +178,7 @@ model_df = model_df.rename(columns={
     'alter':      'Alter'
 })
 
-footnote = pd.DataFrame([{'score_type': '* p<0.05, ** p<0.01, *** p<0.001'}])
+footnote = pd.DataFrame([{'Score': '* p<0.05,\n\n** p<0.01,\n\n*** p<0.001'}])
 model_df = pd.concat([model_df, footnote], ignore_index=True).fillna('')
 
 
